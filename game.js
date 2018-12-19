@@ -1,14 +1,11 @@
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 
-//define all variables
 var width = canvas.width;
 var height = canvas.height;
 var terrainY = new Array();
-var weapons = [[8,7,"blue", "Regular",10], [11,5,"red","Medium",20],
-               [14,3,"black", "Large",30]];
-
-//Hello
+var weapons = [[8,7,"red", "Small",15], [11,5,"blue","Medium",30],
+               [14,3,"green", "Large",45]];
 
 function Angle(a1){
     var my_grad=ctx.createLinearGradient(width/2+20,height*3/4,width*.1+150,0);
@@ -17,7 +14,6 @@ function Angle(a1){
     ctx.fillStyle = "black"
     ctx.fillRect(width/2+20,height*3/4,150,25);
     ctx.fillStyle=my_grad;
-    //ctx.strokeStyle = "black";
     if(a1>=0){
         ctx.fillRect(width/2+20,height*3/4,a1*3/2,25);
     }
@@ -31,7 +27,6 @@ function drawPowerBar(p1){
     ctx.fillStyle = "black"
     ctx.fillRect(width/2+20,height*3/4+50,150,25);
     ctx.fillStyle=my_grad;
-    //ctx.strokeStyle = "black";
     if(p1>=0){
         ctx.fillRect(width/2 + 20,height*3/4+50,p1*3/2,25);
     }
@@ -105,7 +100,6 @@ var gravity = .02;
 var par = 0;
 var Round = 10;
 
-//images
 var bg = new Image();
 var ab = new Image();
 var ar = new Image();
@@ -143,8 +137,7 @@ function randRange(min,max){
 }
 
 function genPoints(width) {
-    var disp = 300;//mxm height of terrainY to be displaced above base line
-    points =  [];
+    var disp = 300;
     var temp =  [];
     points[0] =  new point(0, 0 + base);
     points[1] =  new point(width, 0 + base);
@@ -217,7 +210,6 @@ function startGame(){
     curPlayer = 1;
     par = 0;
     Round = 1;
-    //
     drawTerrain();
     tank1 = new tank(1);
     tank2 = new tank(2);
@@ -287,7 +279,6 @@ function drawTank(tank){
     else
         ctx.fillStyle = "blue"
 
-    //body of player
     ctx.beginPath();
     ctx.moveTo(tank.getpx(),terrainY[tank.getpx()]);
     tank.seti(30);
@@ -319,8 +310,6 @@ function drawTank(tank){
     ctx.closePath();
     ctx.fill();
 
-   
-    //turret
     ctx.beginPath();
     mx = midx1-3*Math.sin(tank.gettheta());
     my = midy1-3*Math.cos(tank.gettheta());
@@ -396,7 +385,7 @@ function launch(){
             t+=1;
             redraw();
             if(y<terrainY[Math.round(x)] && x<=width && x>=0&&clear==false){
-                x = curPlayer.getnx() + weapons[weapon][1]*Math.cos(curPlayer.angle())*curPlayer.getpower()*t/100;//percentage of power
+                x = curPlayer.getnx() + weapons[weapon][1]*Math.cos(curPlayer.angle())*curPlayer.getpower()*t/100;
                 y = curPlayer.getny() - weapons[weapon][1]*Math.sin(curPlayer.angle())*curPlayer.getpower()*t/100 + (0.5*gravity)*(t*t);
                 circle(ctx, x, y,weapons[weapon][0],weapons[weapon][2]);
                 clear = checkDirectHit(x,y,otherPlayer);
@@ -441,8 +430,6 @@ function checkDirectHit(cx,cy,victim){
     
     
     weapon = curPlayer.getweapon();
-
-    //checks if the weapon hits tank directly
     changeDelta(victim);
     if((cx>=victim.getpx() && cx<=victim.getpx()+30 )&&(cy>=terrainY[victim.getpx()]-20 && cy<=terrainY[victim.getpx()])){
         curPlayer.setpoints(curPlayer.getpoints()+weapons[weapon][4]);
@@ -452,7 +439,6 @@ function checkDirectHit(cx,cy,victim){
 }
 
 function checkIndirectHit(cx,cy,radius,victim){
-        //checks if the weapon hits within certain radius of the tank
     if((cx>=victim.getpx()-radius && cx<=victim.getpx()+30+radius )&&
         (cy>=terrainY[victim.getpx()]-20-radius && cy<=terrainY[victim.getpx()]+radius)){
         curPlayer.setpoints(curPlayer.getpoints()+weapons[weapon][4]/2);
@@ -475,7 +461,6 @@ function drawSetup(curPlayer){
     ctx.font="35px Georgia";
     ctx.fillText('Round: '+Round, width/2-50, 35);
     ctx.font="25px Georgia";
-    //ctx.fillText("Player "+ curPlayer.getplayer() + "'s turn!", width/2-75, 40);
     drawArrow(curPlayer);
     ctx.fillText("Your current weapon is: "+ weapons[curPlayer.getweapon()][3] , width/2-155, 65);
     ctx.fillText("Angle: ", width/2-63, height*3/4+20);
