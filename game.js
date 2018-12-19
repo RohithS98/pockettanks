@@ -1,8 +1,79 @@
+/*
+.ball animation problem corrected by removing reqanimationframe and using setinterval
+.understood and used procedural generation. WOW
+.different weapons added 
+.different weapon damage added
+.calculated speeds
+*/
+
 var canvas = document.getElementById("canvas");
+var canvas1 = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
+var ctx1 = canvas1.getContext("2d");
+
+
+function Angle(a1){
+var start=4.72;
+var cw=ctx.canvas.width/2 + 60;
+var ch=ctx.canvas.height - 60;
+var diff;
+var bar=setInterval(progressBar(a1),50);
+    function progressBar(al){
+        diff=(al/100)*Math.PI*2;
+        ctx.beginPath();
+        ctx.arc(cw,ch,width*0.0416,0,2*Math.PI,false);
+        ctx.fillStyle='#FFF';
+        ctx.fill();
+        ctx.strokeStyle='#e7f2ba';
+        ctx.stroke();
+        ctx.fillStyle='#000';
+        ctx.strokeStyle='#b3cf3c';
+        ctx.textAlign='center';
+        ctx.lineWidth=15;
+        ctx.font = '10pt Verdana';
+        ctx.beginPath();
+        ctx.arc(cw,ch,width*0.0416,start,diff+start,false);
+        ctx.stroke();
+        ctx.fillText(al*180/100,cw+2,ch+6);
+            if(al>=50){
+            clearTimeout(bar);
+        }
+    }
+}
+ 
+function drawPowerBar(p1){
+    var start=4.72;
+    var cw=ctx.canvas.width/2;
+    var ch=ctx.canvas.height/2;
+    var diff;
+    var bar=setInterval(progressBar(p1),50);
+    function progressBar(p1){
+        diff=(p1/100)*Math.PI*2;
+        ctx.beginPath();
+        ctx.arc(width/2 - 60,height-60,width*0.0416,0,2*Math.PI,false);
+        ctx.fillStyle='#FFF';
+        ctx.fill();
+        ctx.strokeStyle='#e7f2ba';
+        ctx.stroke();
+        ctx.fillStyle='#000';
+        ctx.strokeStyle='#b3cf3c';
+        ctx.textAlign='center';
+        ctx.lineWidth=15;
+        ctx.font = '10pt Verdana';
+        ctx.beginPath();
+        ctx.arc(width/2 - 60,height-60,width*0.0416,start,diff+start,false);
+        ctx.stroke();
+        ctx.fillText(p1,width/2 - 58,height-54);
+        if(p1>=50){
+            clearTimeout(bar);
+        }
+    }
+}
+
+
 
 //define all variables
-var width = canvas.width;
+var width = canvas.width;        
 var height = canvas.height;
 var terrainY = new Array();
 var weapons = [[8,7,"blue", "Regular",10], [11,5,"red","Medium",20],
@@ -23,8 +94,12 @@ var volley = 1;
 var bg = new Image();
 var bgi = new Image();
 
+
 bg.src = 'assets/img/bg.png';
 bgi.src = 'assets/img/canvasbg.jpg';
+
+//////////////////////////////////////////////////
+//utility
 
 function circle(ctx, cx, cy, radius, color) {
     ctx.fillStyle = color;
@@ -34,128 +109,233 @@ function circle(ctx, cx, cy, radius, color) {
     ctx.fill();
 }
 
-var point =  function(x,y){
+var base = canvas.height*0.8;// min coord from which terrain should start
+var roughness =  0.5;
+var iterations =  5;
+var p;
+var points =  [];//to store the mountains outer points
+
+var coord =  function(x,y)
+    {
     this.x =  x;
     this.y =  y;
-}
 
-var midPoint =  function(p1, p2) {
-    return new point((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
 }
+var midPoint =  function(p1, p2) 
+    {
+    return new coord((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
+    }
 
-function randRange(min,max){
+function randomInRange(min,max)
+{
     var rand =  Math.floor(Math.random()*(max-min))+min; 
     return rand;
 }
 
-function generatePoints(width) {
-    var displacement = 300;//mxm height of terrainY to be displaced above base line
+function generatePoints(width) 
+{
+    var displacement = 275;//mxm height of terrainY to be displaced above base line
     points =  [];
     var temp =  [];
-    points[0] =  new point(0, 0 + base);
-    points[1] =  new point(width, 0 + base);
+    points[0] =  new coord(0, 0 + base);
+    points[1] =  new coord(width, 0 + base);
 
-    for(var i =  0; i < iterations; i++){
-        temp =  [];
-        for(var j =  0; j < points.length - 1; j++){
-            var p1 =  points[j];
-            var p2 =  points[j+1];
-            var mid =  midPoint(p1, p2);
-            if(mid.x > canvas.width / 3 && mid.x < canvas.width * 0.66){
-                mid.y += randRange( -displacement, -displacement / 2);
-            }
-            else{
-                mid.y += randRange(-displacement / 10, -displacement / 25);
-            }
-            temp.push(p1, mid);
+    for(var i =  0; i < iterations; i++) 
+    {
+    temp =  [];
+    for(var j =  0; j < points.length - 1; j++)
+        {
+        var p1 =  points[j];
+        var p2 =  points[j+1];
+        var mid =  midPoint(p1, p2);
+        if(mid.x > canvas.width / 3 && mid.x < canvas.width * 0.66)
+        {
+        mid.y += randomInRange( -displacement, -displacement / 2);
+        }
+        else
+        {
+        mid.y += randomInRange(-displacement / 10, -displacement / 25);}
+        temp.push(p1, mid);
         }
         temp.push(points[points.length - 1]);
-        displacement *=  roughness/5;
+        displacement *=  roughness;
         points =  temp;
     }
+
     return points;
 }
 
+var  len =  points.length;
 function generate() {
     generatePoints(width);
     len =  points.length;
 }
 
+generate();
+var terrainY =  [];
+var t = 0;
+
+for(var i =  1; i < len; i++) 
+    {    
+    var m= (points[i].y-points[i-1].y)/(points[i].x-points[i-1].x);
+        t= 0;
+        for(var j= points[i-1].x; j < points[i].x; ++j)
+        {
+            temp= new coord(Math.floor(j),Math.floor(points[i-1].y+m*(t++)));
+            terrainY.push(temp.y);
+        }
+}
+
+//this function draws the terrain formed from above points
 function drawTerrain(){
+
     ctx.drawImage(bg,0,0,width,height);
     for (var i = 0; i <= width; i++){
         my_grad=ctx.createLinearGradient(0,terrainY[i],0,900);
+    
         my_grad.addColorStop(0,"green");
         my_grad.addColorStop(0.07,"darkgreen");
         my_grad.addColorStop(0.2,"#A0522D");
-        my_grad.addColorStop(0.7,"#8B4513");
+        my_grad.addColorStop(0.7,"#8B4513")
         ctx.fillStyle= my_grad;
         ctx.fillRect(i,Math.floor(terrainY[i]),1,height-terrainY[i]);
     }
+
 }
 
-function tank(playerNo){
-    this.player = playerNo;
-    this.weapon = 0;
-    this.points = 0;
-    this.movesLeft = 75;
-    this.power = 70;
-    this.tooSteep = false;
-    if(this.player == 1){
+function tank(start){
+    this.player = start;
+    this.w = 0;
+    this.health = 100;
+    this.moves = 50;
+    this.power = 50;
+    this.steepbool = false;
+    if(start ==1){
         this.px = 60;
         this.theta = Math.PI/4;
-    }
+        
+        }
     else{
         this.px = 1100;
         this.theta = 3*Math.PI/4;
-    }
+        
+        }
     this.getplayer= function(){return this.player}
+    
     this.angle = function(){return this.theta+this.phi}
-    this.setpx = function(x){this.px = x}
-    this.getpx = function(){return this.px}
-    this.setpy = function(y){this.py = y}
-    this.getpy = function(){return terrainY[this.px]}
+        
+    this.setpx= function(x){this.px = x}//position
+    this.getpx= function(){return this.px}
+    this.setpy= function(y){this.py = y}
+    this.getpy= function(){return terrainY[this.px]}
     
-    this.setnx = function(x){this.nx = x}
-    this.getnx = function(){return this.nx}
-    this.setny = function(y){this.ny = y}
-    this.getny = function(){return this.ny}
+    this.setnx= function(x){this.nx = x}//nozzle end
+    this.getnx= function(){return this.nx}
+    this.setny= function(y){this.ny = y}
+    this.getny= function(){return this.ny}
        
-    this.settheta = function(x){this.theta = x}
-    this.gettheta = function(){return this.theta}
+    this.settheta= function(x){this.theta = x}//angle of tank
+    this.gettheta= function(){return this.theta}
 
-    this.setphi = function(x){this.phi = x}
-    this.getphi = function(){return this.phi}
+    this.setphi= function(x){this.phi = x}
+    this.getphi= function(){return this.phi}
     
-    this.setpoints = function(x){this.points = x}
-    this.getpoints = function(){return this.points}
+    this.sethealth= function(x){this.health = x}//health of tank
+    this.gethealth= function(){return this.health}
     
-    this.seti = function(x){this.i = x}
-    this.geti = function(){return this.i}
+    this.seti= function(x){this.i = x}
+    this.geti=function(){return this.i}
     
-    this.changeWeapon = function(){this.weapon = (this.weapon+1)%3;}
-    this.getweapon = function(){return this.weapon;}
+    this.changeWeapon= function(){this.w = (this.w+1)%3;}//weapon of tank
+    this.getweapon=function(){return this.w;}
     
-    this.getmoves = function(){return this.movesLeft}
-    this.moved = function(){this.movesLeft = this.movesLeft-1}
+    this.getmoves = function(){return this.moves}//moves of tank
+    this.moved = function(){this.moves = this.moves-1}
    
-    this.toosteep = function(){this.steepbool = true}
+    this.toosteep = function(){this.steepbool = true}//checking steep level
     this.notsteep = function(){this.steepbool = false}
     this.steep = function(){return this.steepbool}
    
-    this.getpower = function(){return this.power}
+    this.getpower = function(){return this.power}//power of Turret
     this.setpower = function(tpower){this.power = tpower;}
+    //ugh realised this.xxx is public and var is private.
 }
 
+document.addEventListener('keydown', function(event) {
+    if(gameStarted == true){
+       
+
+        ctx.restore();
+        ctx.clearRect(0, 0, width, height);
+        drawTerrain();
+        if (event.keyCode == 38 && !gamePaused && gamePlay){
+            rotateTurret(curPlayer,1);  //up rotates turret upwards
+        }
+        else if(event.keyCode == 40 && !gamePaused && gamePlay){
+            rotateTurret(curPlayer,-1);       //down rotates turret downwards
+        }
+        else if(event.keyCode ==37 && !gamePaused && gamePlay){
+            moveTank(curPlayer, -5);    //left moves tanks to the left
+        }
+        else if(event.keyCode == 39 && !gamePaused && gamePlay){
+            moveTank(curPlayer, 5);    //right moves tank to the right
+        }
+        else if(event.keyCode == 65 && !gamePaused && gamePlay){
+           
+           if(curPlayer.getpower()>0)
+            curPlayer.setpower(curPlayer.getpower()-1);
+        }
+        else if(event.keyCode == 68 && !gamePaused && gamePlay){
+            if(curPlayer.getpower()<100){
+                curPlayer.setpower(curPlayer.getpower()+1);
+            }
+        }
+        else if(event.keyCode == 87 && !gamePaused && gamePlay){   //'w' changes the weapons
+           
+            curPlayer.changeWeapon();
+        }
+        else if(event.keyCode == 32 && !gamePaused && gamePlay){   //spacebar shoots!!
+          
+            launch(curPlayer);
+        }
+        else if(event.keyCode == 80){   //'p' Pauses the game
+            pauseGame();
+        }
+        else if(event.keyCode == 82){   //'r' restarts the game
+            // startGame(); if you want to play with same terrain
+            location.reload();
+        }
+        
+        redraw();
+    }
+    else {
+        if(event.keyCode == 13 ){
+            startGame();
+        }
+    }
+},false);
+
+
+////////////////////////////////////////////////////////////////////////////////////
+
+//intro function
 function introCard(){
+    
+   
+   
     ctx.fillStyle= "white";
     ctx.font="80px Georgia";
     ctx.fillText("Press Enter to start!", width/2-300, 200);
     ctx.font="40px Georgia"
     ctx.fillText("Press p for pause or rules.", width/2-230, 400);
+    
+    
 }
 
+introCard();
+
 function endGame(loser = 0){
+  
     ctx.clearRect(0,0,width,height);
     ctx.drawImage(bgi,0,0,width,height);
     ctx.fillStyle= "white";
@@ -171,10 +351,14 @@ function endGame(loser = 0){
         ctx.font="60px Georgia";
         ctx.fillText("Draw!" , width/2-90,height/2);
     }
+    
     ctx.fillText("Press 'r' to restart!", width/2-220,height/2+100);
    
 }
+////////////////////////////////////////////////////////////////////////
 
+
+//starter
 function startGame(){
     gameStarted = true;
     drawTerrain();
@@ -185,20 +369,23 @@ function startGame(){
     createTanks(curPlayer,otherPlayer);
     drawTank(curPlayer);
     drawTank(otherPlayer);
+   
     gamePaused = false;
     gamePlay = true;
     redraw();
 }
 
+
+
 function pauseGame(){
     if(gamePaused==false){
         gamePaused = true;
         gamePlay = false;
-    }
+        }
     else{
         gamePaused = false;
         gamePlay = true;
-    }
+        }
 }
 
 function drawPauseScreen(){
@@ -210,6 +397,8 @@ function drawPauseScreen(){
     ctx.font="40px Georgia";
     ctx.fillText("Game Paused!", width/2-135, 200);
     popUp();
+    
+    
 }
 
 function popUp(){
@@ -234,12 +423,17 @@ function popUp(){
     ctx.fillText("Press 'R' to restart the game.", 700, 425);
 }
 
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//this function creates the tanks
 function createTanks(curPlayer,otherPlayer){
     curPlayer.setpy(terrainY[curPlayer.getpx()]-20);
     otherPlayer.setpy(terrainY[curPlayer.getpx()]-20);
 }
 
-//This function draws the tanks
+//this function draws the tanks
 function drawTank(tank){
     if(tank.getplayer() == 1)  
         ctx.fillStyle = "red";
@@ -289,7 +483,7 @@ function drawTank(tank){
     ctx.lineTo(mx+25*Math.cos(tank.angle()),my-25*Math.sin(tank.angle()));
     ctx.closePath();
     ctx.fill();
-    ctx.strokeStyle='black';
+    //ctx.strokeStyle='black';
     ctx.stroke();
     tank.setnx(mx+25*Math.cos(tank.angle()));
     tank.setny(my-25*Math.sin(tank.angle()));
@@ -317,20 +511,27 @@ function moveTank(curPlayer, dir){
     if(curPlayer.getmoves() != 0){
         curPlayer.setpx(curPlayer.getpx()+dir);
         delta = Math.abs(terrainY[curPlayer.getpx()]-terrainY[curPlayer.getpx()+curPlayer.geti()]);
+  
         if(delta>25){
             curPlayer.setpx(curPlayer.getpx()-dir);
-            curPlayer.toosteep();    
+            curPlayer.toosteep();
+         
         }
         else{
             curPlayer.notsteep();
             curPlayer.moved();
         }
     }
+
+
 }
 
+
 function changeDelta(victim){
-    delta = Math.abs(terrainY[victim.getpx()]-terrainY[victim.getpx()+victim.geti()/2]);  
+    delta = Math.abs(terrainY[victim.getpx()]-terrainY[victim.getpx()+victim.geti()/2]);
+  
     while(delta>25){
+    
         if(victim.getplayer() == 2){
             victim.setpx(victim.getpx()+5);
         }
@@ -339,14 +540,20 @@ function changeDelta(victim){
         }
         delta = Math.abs(terrainY[victim.getpx()]-terrainY[victim.getpx()+victim.geti()]);
     }
+    
 }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 //this function launches the cannon
 function launch(){
     gamePlay = false;
+   
+   
     weapon = curPlayer.getweapon();
     var t = 0;
     var x = curPlayer.getnx();
     var y = curPlayer.getny();
+
     var clear = false;
     var ani = setInterval(function(){projectile()}, 10);
 
@@ -386,6 +593,7 @@ function launch(){
     }
 }
 
+
 //this function makes a hole in the terrain where the weapon lands
 function explode(x,y,radius,player){
     x = Math.round(x);
@@ -396,6 +604,7 @@ function explode(x,y,radius,player){
     checkIndirectHit(x,y,radius,player);
    
 }
+
 
 //this function checks if the weapon hits the tank
 function checkDirectHit(cx,cy,victim){
@@ -415,7 +624,6 @@ function checkDirectHit(cx,cy,victim){
 
 
 }
-
 function checkIndirectHit(cx,cy,radius,victim){
         //checks if the weapon hits within certain radius of the tank
     if((cx>=victim.getpx()-radius && cx<=victim.getpx()+30+radius )&&
@@ -425,6 +633,8 @@ function checkIndirectHit(cx,cy,radius,victim){
         console.log("Indirect Hit");
     }
 }
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 function drawSetup(curPlayer){
     ctx.fillStyle= "black";
@@ -433,43 +643,89 @@ function drawSetup(curPlayer){
 
     ctx.font="20px Georgia";
     ctx.fillText("Player "+ curPlayer.getplayer() + "'s turn!", width/2-75, 40);
-    //console.log(weapons);
     ctx.fillText("Your current weapon is: "+ weapons[curPlayer.getweapon()][3] , width/2-135, 65);
     if(curPlayer.getplayer() == 1){
         ctx.fillText("Angle: " + (Math.floor((curPlayer.gettheta()*360/(2*Math.PI)))), width/2-165, 90);
+        drawPowerBar(curPlayer.getpower());
+        Angle(Math.floor((curPlayer.gettheta()*360*100/(2*180*Math.PI))));
     }
     else {
         ctx.fillText("Angle: " + (180-Math.floor((curPlayer.gettheta()*360/(2*Math.PI)))), width/2-165, 90);
     }
     ctx.fillText("Power: " + curPlayer.getpower(), width/2-55, 90);
     ctx.fillText("Moves: " + curPlayer.getmoves(), width/2+75, 90);
-    // if(curPlayer.getmoves() == 0 ){
-    //     curPlayer.notsteep();
-    //     ctx.font = "25px Georgia"
-    //     ctx.fillText("No More Moves!", width/2-96, 155);
-    // }
+    if(curPlayer.getmoves() == 0 ){
+        curPlayer.notsteep();
+        ctx.font = "25px Georgia"
+        ctx.fillText("No More Moves!", width/2-96, 155);
+    }
+    if(curPlayer.steep() == true){
+            ctx.font = "25px Georgia";
+            ctx.fillText("That is too steep!", width/2-100, 155);
+    }
 }
 
-function drawPoints(tank1,tank2){
-    var p1 = tank1.getpoints();
-    var p2 = tank2.getpoints();
+
+
+function drawHealthBar(tank1,tank2){
+    var health1 = tank1.gethealth();
+    var health2 = tank2.gethealth();
     
     ctx.fillStyle= "black";
     ctx.font="25px Georgia";
-    ctx.fillText("Player 1:\n"+p1,width*.1,40);
-    ctx.fillText("Player 2:\n"+p2,width*.7,40);
+    ctx.fillText("Player 1 Health: "+health1,width*.1,40);
+    ctx.fillText("Player 2 Health: "+health2,width*.7,40);
+    
+    //p1_health
+    var my_grad=ctx.createLinearGradient(width*.1,0,width*.1+150,0);
+    my_grad.addColorStop(0,"firebrick");
+    my_grad.addColorStop(0.5,"gold");
+    my_grad.addColorStop(1,"limegreen");
+    ctx.fillStyle = "black"
+    ctx.fillRect(width*.1,50,150,50);
+    ctx.fillStyle=my_grad;
+    //ctx.strokeStyle = "black";
+    if(health1>=0){
+        ctx.fillRect(width*.1,50,health1*3/2,50);
+    }
+    ctx.strokeRect(width*.1,50,150,50);
+    
+    //p2_health
+    var my_gradn=ctx.createLinearGradient(width*.7,0,width*.7+150,0);//why should i initialise again?
+    my_gradn.addColorStop(0,"firebrick");
+    my_gradn.addColorStop(0.5,"gold");
+    my_gradn.addColorStop(1,"limegreen");
+    ctx.fillStyle = "black"
+    ctx.fillRect(width*.7,50,150,50);
+    ctx.fillStyle=my_gradn;
+   // ctx.strokeStyle = "black";
+    if(health2>=0){
+        ctx.fillRect(width*.7,50,health2*3/2,50);
+    }
+    ctx.strokeRect(width*.7,50,150,50);
 }
 
 function checkEndGame(){
     if(volley>10){
-        if(tank1.getpoints()>tank2.getpoints())
+        if(tank1.gethealth()>tank2.gethealth())
             endGame(tank2);
-        else if(tank1.getpoints()<tank2.getpoints())
-            endGame(tank1);
-        else endGame();
-    }
+        else if(tank1.gethealth()<tank2.gethealth())
+                endGame(tank1);
+            else endGame();
+
+    }  
+    else   if(tank1.gethealth()<= 0){
+                tank1.sethealth(0);
+                endGame(tank1);
+            }
+            else if(tank2.gethealth()<=0){
+                    tank2.sethealth(0);
+                    endGame(tank2);
+                }  
+
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////
 function redraw(){
     ctx.restore();
     ctx.clearRect(0, 0, width, height);
@@ -478,80 +734,10 @@ function redraw(){
     drawTank(tank2);
     if(gamePaused == true){drawPauseScreen();}
     drawSetup(curPlayer);
-    drawPoints(tank1,tank2);
+    //drawPowerBar(50);
+    //Angle(0);
     checkEndGame();
 }
 
-var base = canvas.height*0.9;
-var roughness =  0.1;
-var iterations =  5;
-var p;
-var points =  [];//to store the mountains outer points
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
-var  len =  points.length;
-generate();
-var terrainY =  [];
-var t = 0;
-
-for(var i =  1; i < len; i++) 
-    {    
-    var m= (points[i].y-points[i-1].y)/(points[i].x-points[i-1].x);
-        t= 0;
-        for(var j= points[i-1].x; j < points[i].x; ++j)
-        {
-            temp= new point(Math.floor(j),Math.floor(points[i-1].y+m*(t++)));
-            terrainY.push(temp.y);
-        }
-}
-
-document.addEventListener('keydown', function(event) {
-    if(gameStarted == true){
-        ctx.restore();
-        ctx.clearRect(0, 0, width, height);
-        drawTerrain();
-        if (event.keyCode == 38 && !gamePaused && gamePlay){
-            rotateTurret(curPlayer,1);  //up rotates turret upwards
-        }
-        else if(event.keyCode == 40 && !gamePaused && gamePlay){
-            rotateTurret(curPlayer,-1);       //down rotates turret downwards
-        }
-        else if(event.keyCode ==37 && !gamePaused && gamePlay){
-            moveTank(curPlayer, -5);    //left moves tanks to the left
-        }
-        else if(event.keyCode == 39 && !gamePaused && gamePlay){
-            moveTank(curPlayer, 5);    //right moves tank to the right
-        }
-        else if(event.keyCode == 65 && !gamePaused && gamePlay){
-           
-           if(curPlayer.getpower()>0)
-            curPlayer.setpower(curPlayer.getpower()-1);
-        }
-        else if(event.keyCode == 68 && !gamePaused && gamePlay){
-            if(curPlayer.getpower()<100){
-                curPlayer.setpower(curPlayer.getpower()+1);
-            }
-        }
-        else if(event.keyCode == 87 && !gamePaused && gamePlay){   //'w' changes the weapons
-            curPlayer.changeWeapon();
-        }
-        else if(event.keyCode == 32 && !gamePaused && gamePlay){   //spacebar shoots!!
-          
-            launch(curPlayer);
-        }
-        else if(event.keyCode == 80){   //'p' Pauses the game
-            pauseGame();
-        }
-        else if(event.keyCode == 82){   //'r' restarts the game
-            // startGame(); if you want to play with same terrain
-            location.reload();
-        }
-        redraw();
-    }
-    else {
-        if(event.keyCode == 13 ){
-            startGame();
-        }
-    }
-},false);
-
-introCard();

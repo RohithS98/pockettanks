@@ -1,65 +1,15 @@
 <!DOCTYPE html>
-<html lang="en" >
-
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Responsive CSS Grid Menu for Asteroids- 3D Universe</title>
-      <link rel="stylesheet" href="css/indexStyle.css">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<title>Pocket Tanks</title>
+	<link rel="icon" type="image/png" href="assets/img/tank.png">
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<link href="https://fonts.googleapis.com/css?family=Gloria+Hallelujah" rel="stylesheet">
 </head>
 <body>
-   <div class="placeholder"> 
-        <canvas id="universe" style="height:650px"></canvas>
-        <div class="container" id="containerId">
-            <h1>POCKET TANKS</h1>
-            <div id="menu">
-                <ul>
-                    <li onclick="select(this)" id="btn" tabindex="0">
-                        <span> NewGame </span>
-                    </li>
-                    <li onclick="select(this)" id="btn" tabindex="0">
-                        <span> Help </span>
-                    </li>
-                    <li onclick="select(this)" id="btn" tabindex="0">
-                        <span> Exit </span>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
-    <script  src="js/index.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-<script>
-$(document).keydown(
-    function(e)
-    {    
-        //38 is the keycode for arrow up
-        if (e.keyCode == 40) {  
-          //check if a li is focused, if not it focus the first one    
-          if($('li').is(':focus')){
-            $("li:focus").next().focus();
-          }
-          else{
-            $("li:first-child").focus();
-          }
-
-        }
-        else if (e.keyCode == 38) {      
-          if($('li').is(':focus')){
-            $("li:focus").prev().focus();
-          }
-          else{
-            $("li:first-child").focus();
-          }
-        }
-    }
-);
-$(document).keypress(
-    function(e){
-        if (e.keyCode == 13) {
-            $('li').click();
-        }
-    }
-);
-</script>
+	<h1>Pocket Tanks</h1>
+	<canvas id="canvas" width="1200" height="560"></canvas>
+<script type="text/javascript" src="game.js"></script>
 </body>
 </html>
