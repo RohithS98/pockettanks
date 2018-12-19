@@ -70,17 +70,13 @@ for(i = 0; i < asteroids; i++){
 }}
 executeFrame();
 function select(element){
-element.addEventListener('webkitAnimationEnd', function(){
+  element.addEventListener('webkitAnimationEnd', function(){
     this.style.webkitAnimationName = '';
-}, false);
-element.style.animation = "selectoption 0.2s cubic-bezier(0.86, 0, 0.07, 1) forwards" ;
-location.href = "game.html";
+  }, false);
+  element.style.animation = "selectoption 0.2s cubic-bezier(0.86, 0, 0.07, 1) forwards" ;
+  if (element.id == "newbtn") 
+    location.href = "game.html";
+  if (element.id == "hlpbtn") {
+    location.href = "help.html";
+  }
 }
-
-// var element = document.getElementById("btn");
-// element.addEventListener("keyup", function(event) {
-//   event.preventDefault();
-//   if (event.keyCode === 13) {
-//     select(element);
-//   }
-// }
