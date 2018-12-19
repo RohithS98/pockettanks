@@ -58,13 +58,3 @@ canvas{
 canvas:focus{
 	border:none;
 }
-
-#link{
-	text-decoration: none;
-}
-
-#link:hover{
-	
-	text-decoration: none;
-	color:red;
-}
