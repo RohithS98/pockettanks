@@ -8,6 +8,68 @@ var terrainY = new Array();
 var weapons = [[8,7,"blue", "Regular",10], [11,5,"red","Medium",20],
                [14,3,"black", "Large",30]];
 
+//Hello
+
+function Angle(a1){
+    var start=4.72;
+    var cw=ctx.canvas.width/2 + 60;
+    var ch=ctx.canvas.height - 60;
+    var diff;
+    var bar=setInterval(progressBar(a1),50);
+    
+    function progressBar(al){
+        diff=(al/100)*Math.PI*2;
+        ctx.beginPath();
+        ctx.arc(cw,ch,width*0.0416,0,2*Math.PI,false);
+        ctx.fillStyle='#FFF';
+        ctx.fill();
+        ctx.strokeStyle='#e7f2ba';
+        ctx.stroke();
+        ctx.fillStyle='#000';
+        ctx.strokeStyle='#b3cf3c';
+        ctx.textAlign='center';
+        ctx.lineWidth=15;
+        ctx.font = '10pt Verdana';
+        ctx.beginPath();
+        ctx.arc(cw,ch,width*0.0416,start,diff+start,false);
+        ctx.stroke();
+        ctx.fillText(al*180/100,cw+2,ch+6);
+        if(al>=50){
+            clearTimeout(bar);
+        }
+    }
+}
+     
+function drawPowerBar(p1){
+    var start=4.72;
+    var cw=ctx.canvas.width/2;
+    var ch=ctx.canvas.height/2;
+    var diff;
+    var bar=setInterval(progressBar(p1),50);
+    function progressBar(p1){
+        diff=(p1/100)*Math.PI*2;
+        ctx.beginPath();
+        ctx.arc(width/2 - 60,height-60,width*0.0416,0,2*Math.PI,false);
+        ctx.fillStyle='#FFF';
+        ctx.fill();
+        ctx.strokeStyle='#e7f2ba';
+        ctx.stroke();
+        ctx.fillStyle='#000';
+        ctx.strokeStyle='#b3cf3c';
+        ctx.textAlign='center';
+        ctx.lineWidth=15;
+        ctx.font = '10pt Verdana';
+        ctx.beginPath();
+        ctx.arc(width/2 - 60,height-60,width*0.0416,start,diff+start,false);
+        ctx.stroke();
+        ctx.fillText(p1,width/2 - 58,height-54);
+        if(p1>=50){
+            clearTimeout(bar);
+        }
+    }
+}
+    
+
 function tank(playerNo){
     this.player = playerNo;
     this.weapon = 0;
