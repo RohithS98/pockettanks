@@ -110,11 +110,17 @@ var bg = new Image();
 var bgi = new Image();
 var ab = new Image();
 var ar = new Image();
+var winpl1 = new Image();
+var winpl2 = new Image();
+var drawgame = new Image();
 
 bg.src = 'assets/img/bg1.jpg';
 bgi.src = 'assets/img/canvasbg.jpg';
 ab.src = 'assets/img/arrow-blue.svg';
 ar.src = 'assets/img/arrow-red.svg';
+winpl1.src = 'assets/img/trophyp1.svg';
+winpl2.src = 'assets/img/trophyp2.svg';
+drawgame.src = 'assets/img/handshake.png';
 
 function circle(ctx, cx, cy, radius, color) {
     ctx.fillStyle = color;
@@ -190,21 +196,21 @@ function endGame(loser = 0){
     gamePlay = false;
     setTimeout(function(){
         ctx.clearRect(0,0,width,height);
-        ctx.drawImage(bgi,0,0,width,height);
-        ctx.fillStyle= "white";
+        ctx.fillStyle= "black";
         ctx.font="80px Georgia";
-        ctx.fillText("Game Over!", width/2-190, height/2-100);
+        ctx.fillText("Game Over!", width/2-10, height/2-100);
         if(loser != 0){
-            if(loser.getplayer() ==1){var winner = 2}
-            else{var winner = 1;}
+            if(loser.getplayer() ==1){var winner = 2;ctx.drawImage(winpl2,0,0,424,560);}
+            else{var winner = 1;ctx.drawImage(winpl1,0,0,424,560);}
             ctx.font="60px Georgia";
-            ctx.fillText("Player "+ winner + " Won!" , width/2-170,height/2);
+            ctx.fillText("Player "+ winner + " Won!" , width/2+5,height/2);
         }
         else {
             ctx.font="60px Georgia";
-            ctx.fillText("Draw!" , width/2-90,height/2);
+            ctx.drawImage(drawgame,68,68,424,424);
+            ctx.fillText("Draw!" , width/2+100,height/2);
         }
-        ctx.fillText("Press 'r' to restart!", width/2-220,height/2+100);
+        ctx.fillText("Press 'r' to restart!", width/2-55,height/2+100);
     },2000);
 }
 
@@ -502,7 +508,7 @@ function drawPoints(tank1,tank2){
 }
 
 function checkEndGame(){
-    if(Round>10){
+    if(Round>1){
         if(tank1.getpoints()>tank2.getpoints())
             endGame(tank2);
         else if(tank1.getpoints()<tank2.getpoints())
@@ -517,9 +523,9 @@ function redraw(){
     drawTerrain();
     drawTank(tank1);
     drawTank(tank2);
-    if(gamePaused == true){drawPauseScreen();}
     drawSetup(curPlayer);
     drawPoints(tank1,tank2);
+    if(gamePaused == true){drawPauseScreen();}
     checkEndGame();
 }
 
