@@ -10,64 +10,33 @@ var weapons = [[8,7,"blue", "Regular",10], [11,5,"red","Medium",20],
 
 //Hello
 
-// function Angle(a1){
-//     var start = 4.72;
-//     var cw = ctx.canvas.width/2 + 60;
-//     var ch = ctx.canvas.height - 60;
-//     var diff;
-//     var bar = setInterval(progressBar(a1),50);
-    
-//     function progressBar(al){
-//         diff=(al/100)*Math.PI*2;
-//         ctx.beginPath();
-//         ctx.arc(cw,ch,width*0.0416,0,2*Math.PI,false);
-//         ctx.fillStyle='#FFF';
-//         ctx.fill();
-//         ctx.strokeStyle='#e7f2ba';
-//         ctx.stroke();
-//         ctx.fillStyle='#000';
-//         ctx.strokeStyle='#b3cf3c';
-//         ctx.textAlign='center';
-//         ctx.lineWidth=15;
-//         ctx.font = '10pt Verdana';
-//         ctx.beginPath();
-//         ctx.arc(cw,ch,width*0.0416,start,diff+start,false);
-//         ctx.stroke();
-//         ctx.fillText(al*180/100,cw+2,ch+6);
-//         if(al>=50){
-//             clearTimeout(bar);
-//         }
-//     }
-// }
+function Angle(a1){
+    var my_grad=ctx.createLinearGradient(width/2+20,height*3/4,width*.1+150,0);
+    my_grad.addColorStop(0,"firebrick");
+    my_grad.addColorStop(1,"red");
+    ctx.fillStyle = "black"
+    ctx.fillRect(width/2+20,height*3/4,150,25);
+    ctx.fillStyle=my_grad;
+    //ctx.strokeStyle = "black";
+    if(a1>=0){
+        ctx.fillRect(width/2+20,height*3/4,a1*3/2,25);
+    }
+    ctx.strokeRect(width/2+20,height*3/4,150,25);
+}
      
-// function drawPowerBar(p1){
-//     var start=4.72;
-//     var cw=ctx.canvas.width/2;
-//     var ch=ctx.canvas.height/2;
-//     var diff;
-//     var bar=setInterval(progressBar(p1),50);
-//     function progressBar(p1){
-//         diff=(p1/100)*Math.PI*2;
-//         ctx.beginPath();
-//         ctx.arc(width/2 - 60,height-60,width*0.0416,0,2*Math.PI,false);
-//         ctx.fillStyle='#FFF';
-//         ctx.fill();
-//         ctx.strokeStyle='#e7f2ba';
-//         ctx.stroke();
-//         ctx.fillStyle='#000';
-//         ctx.strokeStyle='#b3cf3c';
-//         ctx.textAlign='center';
-//         ctx.lineWidth=15;
-//         ctx.font = '10pt Verdana';
-//         ctx.beginPath();
-//         ctx.arc(width/2 - 60,height-60,width*0.0416,start,diff+start,false);
-//         ctx.stroke();
-//         ctx.fillText(p1,width/2 - 58,height-54);
-//         if(p1>=50){
-//             clearTimeout(bar);
-//         }
-//     }
-// }
+function drawPowerBar(p1){
+    var my_grad=ctx.createLinearGradient(width/2+20,height*3/4+50,width*.1+150,0);
+    my_grad.addColorStop(0,"firebrick");
+    my_grad.addColorStop(1,"red");
+    ctx.fillStyle = "black"
+    ctx.fillRect(width/2+20,height*3/4+50,150,25);
+    ctx.fillStyle=my_grad;
+    //ctx.strokeStyle = "black";
+    if(p1>=0){
+        ctx.fillRect(width/2 + 20,height*3/4+50,p1*3/2,25);
+    }
+    ctx.strokeRect(width/2 + 20,height*3/4+50,150,25);
+}
     
 
 function tank(playerNo){
@@ -134,14 +103,18 @@ var gameStarted = false;
 
 var gravity = .02;
 var rally = 0;
-var volley = 1;
+var Round = 1;
 
 //images
 var bg = new Image();
 var bgi = new Image();
+var ab = new Image();
+var ar = new Image();
 
 bg.src = 'assets/img/bg1.jpg';
 bgi.src = 'assets/img/canvasbg.jpg';
+ab.src = 'assets/img/arrow-blue.svg';
+ar.src = 'assets/img/arrow-red.svg';
 
 function circle(ctx, cx, cy, radius, color) {
     ctx.fillStyle = color;
@@ -199,7 +172,6 @@ function generate() {
 }
 
 function drawTerrain(){
-    console.log(bg);
     ctx.drawImage(bg,0,0,width,height);
     for (var i = 0; i <= width; i++){
         my_grad=ctx.createLinearGradient(0,terrainY[i],0,900);
@@ -240,7 +212,7 @@ function startGame(){
     gameStarted = true;
     curPlayer = 1;
     rally = 0;
-    volley = 1;
+    Round = 1;
     //
     drawTerrain();
     tank1 = new tank(1);
@@ -289,7 +261,7 @@ function popUp(){
     ctx.fillText("The different weapons have different speeds and size.", 200, 325);
     ctx.fillText("The weapons with the largest size will have the most impact.", 200, 350);
     ctx.fillText("You have a limited number of moves; so use them wisely.", 200, 375);
-    ctx.fillText("There are a total of 10 volleys.", 200, 400);
+    ctx.fillText("There are a total of 10 Rounds.", 200, 400);
     ctx.fillText("The last tank standing wins!", 200, 425);
     ctx.fillText("Hit the SpaceBar to fire!", 700, 275);
     ctx.fillText("Left and right arrows will move the tank.", 700, 300);
@@ -445,7 +417,7 @@ function launch(){
             }
             gamePlay=true;
              ++rally;
-            if(rally%2==0 && rally!=0)++volley;
+            if(rally%2==0 && rally!=0)++Round;
            
             redraw();
         }
@@ -486,24 +458,35 @@ function checkIndirectHit(cx,cy,radius,victim){
     }
 }
 
+function drawArrow(player){
+    var px,py;
+    px = player.getpx();
+    py = player.getpy()-75;
+    var im = ab;
+    if(player == tank1){
+        im = ar;
+    }
+    ctx.drawImage(im,px-6,py,12,20);
+}
+
 function drawSetup(curPlayer){
     ctx.fillStyle= "black";
-    ctx.font="15px Georgia";
-    ctx.fillText('Volley: '+volley, width/2-40, 20);
-
-    ctx.font="20px Georgia";
-    ctx.fillText("Player "+ curPlayer.getplayer() + "'s turn!", width/2-75, 40);
-    ctx.fillText("Your current weapon is: "+ weapons[curPlayer.getweapon()][3] , width/2-135, 65);
-    if(curPlayer.getplayer() == 1){
-        ctx.fillText("Angle: " + (Math.floor((curPlayer.gettheta()*360/(2*Math.PI)))), width/2-165, 90);
-        // drawPowerBar(curPlayer.getpower());
-        // Angle(Math.floor((curPlayer.gettheta()*360*100/(2*180*Math.PI))));
+    ctx.font="35px Georgia";
+    ctx.fillText('Round: '+Round, width/2-50, 35);
+    ctx.font="25px Georgia";
+    //ctx.fillText("Player "+ curPlayer.getplayer() + "'s turn!", width/2-75, 40);
+    drawArrow(curPlayer);
+    ctx.fillText("Your current weapon is: "+ weapons[curPlayer.getweapon()][3] , width/2-155, 65);
+    ctx.fillText("Angle: ", width/2-63, height*3/4+20);
+    drawPowerBar(curPlayer.getpower());
+    theta1 = curPlayer.gettheta()*360*100/(2*180*Math.PI);
+    if(curPlayer == tank2){
+        theta1 = 100 - (curPlayer.gettheta()*360*100/(2*180*Math.PI));
     }
-    else {
-        ctx.fillText("Angle: " + (180-Math.floor((curPlayer.gettheta()*360/(2*Math.PI)))), width/2-165, 90);
-    }
-    ctx.fillText("Power: " + curPlayer.getpower(), width/2-55, 90);
-    ctx.fillText("Moves: " + curPlayer.getmoves(), width/2+75, 90);
+    Angle(Math.floor(theta1));
+    ctx.fillStyle= "black";
+    ctx.fillText("Power: ", width/2-70, height*3/4+70);
+    ctx.fillText("Moves: " + curPlayer.getmoves(), width/2-30, height*3/4+110);
 }
 
 function drawPoints(tank1,tank2){
@@ -519,7 +502,7 @@ function drawPoints(tank1,tank2){
 }
 
 function checkEndGame(){
-    if(volley>1){
+    if(Round>10){
         if(tank1.getpoints()>tank2.getpoints())
             endGame(tank2);
         else if(tank1.getpoints()<tank2.getpoints())
@@ -529,7 +512,6 @@ function checkEndGame(){
 }
 
 function redraw(){
-    console.log("gasdzjk");
     ctx.restore();
     ctx.clearRect(0, 0, width, height);
     drawTerrain();
@@ -567,7 +549,6 @@ var terrainY =  getTerrainY();
 
 
 document.addEventListener('keydown', function(event) {
-    //console.log(gamePaused,gamePlay,gameStarted,event.keyCode);
     if(gameStarted == true){
         ctx.restore();
         ctx.clearRect(0, 0, width, height);
@@ -625,10 +606,8 @@ document.addEventListener('keydown', function(event) {
             generate();
             terrainY =  getTerrainY();
             startGame();
-            // console.log(gameStarted);
         }
     }
 },false);
 
 startGame();
-// console.log(gameStarted);
