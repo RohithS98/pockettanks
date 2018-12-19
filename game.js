@@ -7,9 +7,64 @@ var height = canvas.height;
 var terrainY = new Array();
 var weapons = [[8,7,"blue", "Regular",10], [11,5,"red","Medium",20],
                [14,3,"black", "Large",30]];
+
+function tank(playerNo){
+    this.player = playerNo;
+    this.weapon = 0;
+    this.points = 0;
+    this.movesLeft = 75;
+    this.power = 70;
+    this.tooSteep = false;
+    if(this.player == 1){
+        this.px = 60;
+        this.theta = Math.PI/4;
+    }
+    else{
+        this.px = 1100;
+        this.theta = 3*Math.PI/4;
+    }
+    this.getplayer= function(){return this.player}
+    this.angle = function(){return this.theta+this.phi}
+    this.setpx = function(x){this.px = x}
+    this.getpx = function(){return this.px}
+    this.setpy = function(y){this.py = y}
+    this.getpy = function(){return terrainY[this.px]}
+
+    this.setnx = function(x){this.nx = x}
+    this.getnx = function(){return this.nx}
+    this.setny = function(y){this.ny = y}
+    this.getny = function(){return this.ny}
+        
+    this.settheta = function(x){this.theta = x}
+    this.gettheta = function(){return this.theta}
+
+    this.setphi = function(x){this.phi = x}
+    this.getphi = function(){return this.phi}
+
+    this.setpoints = function(x){this.points = x}
+    this.getpoints = function(){return this.points}
+
+    this.seti = function(x){this.i = x}
+    this.geti = function(){return this.i}
+
+    this.changeWeapon = function(){this.weapon = (this.weapon+1)%3;}
+    this.getweapon = function(){return this.weapon;}
+
+    this.getmoves = function(){return this.movesLeft}
+    this.moved = function(){this.movesLeft = this.movesLeft-1}
+
+    this.toosteep = function(){this.steepbool = true}
+    this.notsteep = function(){this.steepbool = false}
+    this.steep = function(){return this.steepbool}
+
+    this.getpower = function(){return this.power}
+    this.setpower = function(tpower){this.power = tpower;}
+}
+
 var tank1 = new tank(1);
 var tank2 = new tank(2);
 var curPlayer = 1;
+var prevPlay = false;
 
 var gamePaused = false;
 var gamePlay = false;
@@ -23,7 +78,7 @@ var volley = 1;
 var bg = new Image();
 var bgi = new Image();
 
-bg.src = 'assets/img/bg.png';
+bg.src = 'assets/img/bg1.jpg';
 bgi.src = 'assets/img/canvasbg.jpg';
 
 function circle(ctx, cx, cy, radius, color) {
@@ -82,6 +137,7 @@ function generate() {
 }
 
 function drawTerrain(){
+    console.log(bg);
     ctx.drawImage(bg,0,0,width,height);
     for (var i = 0; i <= width; i++){
         my_grad=ctx.createLinearGradient(0,terrainY[i],0,900);
@@ -94,89 +150,36 @@ function drawTerrain(){
     }
 }
 
-function tank(playerNo){
-    this.player = playerNo;
-    this.weapon = 0;
-    this.points = 0;
-    this.movesLeft = 75;
-    this.power = 70;
-    this.tooSteep = false;
-    if(this.player == 1){
-        this.px = 60;
-        this.theta = Math.PI/4;
-    }
-    else{
-        this.px = 1100;
-        this.theta = 3*Math.PI/4;
-    }
-    this.getplayer= function(){return this.player}
-    this.angle = function(){return this.theta+this.phi}
-    this.setpx = function(x){this.px = x}
-    this.getpx = function(){return this.px}
-    this.setpy = function(y){this.py = y}
-    this.getpy = function(){return terrainY[this.px]}
-    
-    this.setnx = function(x){this.nx = x}
-    this.getnx = function(){return this.nx}
-    this.setny = function(y){this.ny = y}
-    this.getny = function(){return this.ny}
-       
-    this.settheta = function(x){this.theta = x}
-    this.gettheta = function(){return this.theta}
-
-    this.setphi = function(x){this.phi = x}
-    this.getphi = function(){return this.phi}
-    
-    this.setpoints = function(x){this.points = x}
-    this.getpoints = function(){return this.points}
-    
-    this.seti = function(x){this.i = x}
-    this.geti = function(){return this.i}
-    
-    this.changeWeapon = function(){this.weapon = (this.weapon+1)%3;}
-    this.getweapon = function(){return this.weapon;}
-    
-    this.getmoves = function(){return this.movesLeft}
-    this.moved = function(){this.movesLeft = this.movesLeft-1}
-   
-    this.toosteep = function(){this.steepbool = true}
-    this.notsteep = function(){this.steepbool = false}
-    this.steep = function(){return this.steepbool}
-   
-    this.getpower = function(){return this.power}
-    this.setpower = function(tpower){this.power = tpower;}
-}
-
-function introCard(){
-    ctx.fillStyle= "white";
-    ctx.font="80px Georgia";
-    ctx.fillText("Press Enter to start!", width/2-300, 200);
-    ctx.font="40px Georgia"
-    ctx.fillText("Press p for pause or rules.", width/2-230, 400);
-}
-
 function endGame(loser = 0){
-    ctx.clearRect(0,0,width,height);
-    ctx.drawImage(bgi,0,0,width,height);
-    ctx.fillStyle= "white";
-    ctx.font="80px Georgia";
-    ctx.fillText("Game Over!", width/2-190, height/2-100);
-    if(loser != 0){
-        if(loser.getplayer() ==1){var winner = 2}
-        else{var winner = 1;}
-        ctx.font="60px Georgia";
-        ctx.fillText("Player "+ winner + " Won!" , width/2-170,height/2);
-    }
-    else {
-        ctx.font="60px Georgia";
-        ctx.fillText("Draw!" , width/2-90,height/2);
-    }
-    ctx.fillText("Press 'r' to restart!", width/2-220,height/2+100);
-   
+    gameStarted = false;
+    gamePaused = false;
+    gamePlay = false;
+    setTimeout(function(){
+        ctx.clearRect(0,0,width,height);
+        ctx.drawImage(bgi,0,0,width,height);
+        ctx.fillStyle= "white";
+        ctx.font="80px Georgia";
+        ctx.fillText("Game Over!", width/2-190, height/2-100);
+        if(loser != 0){
+            if(loser.getplayer() ==1){var winner = 2}
+            else{var winner = 1;}
+            ctx.font="60px Georgia";
+            ctx.fillText("Player "+ winner + " Won!" , width/2-170,height/2);
+        }
+        else {
+            ctx.font="60px Georgia";
+            ctx.fillText("Draw!" , width/2-90,height/2);
+        }
+        ctx.fillText("Press 'r' to restart!", width/2-220,height/2+100);
+    },2000);
 }
 
 function startGame(){
     gameStarted = true;
+    curPlayer = 1;
+    rally = 0;
+    volley = 1;
+    //
     drawTerrain();
     tank1 = new tank(1);
     tank2 = new tank(2);
@@ -192,12 +195,13 @@ function startGame(){
 
 function pauseGame(){
     if(gamePaused==false){
+        prevPlay = gamePlay;
         gamePaused = true;
         gamePlay = false;
     }
     else{
         gamePaused = false;
-        gamePlay = true;
+        gamePlay = prevPlay;
     }
 }
 
@@ -406,23 +410,17 @@ function checkDirectHit(cx,cy,victim){
     //checks if the weapon hits tank directly
     changeDelta(victim);
     if((cx>=victim.getpx() && cx<=victim.getpx()+30 )&&(cy>=terrainY[victim.getpx()]-20 && cy<=terrainY[victim.getpx()])){
-        victim.sethealth(victim.gethealth()-weapons[weapon][4]);
-        checkEndGame();
-        console.log("Direct Hit");
+        curPlayer.setpoints(curPlayer.getpoints()+weapons[weapon][4]);
         return true;
     }
     return false;
-
-
 }
 
 function checkIndirectHit(cx,cy,radius,victim){
         //checks if the weapon hits within certain radius of the tank
     if((cx>=victim.getpx()-radius && cx<=victim.getpx()+30+radius )&&
         (cy>=terrainY[victim.getpx()]-20-radius && cy<=terrainY[victim.getpx()]+radius)){
-        victim.sethealth(victim.gethealth()-(weapons[weapon][4]/2));
-        checkEndGame();
-        console.log("Indirect Hit");
+        curPlayer.setpoints(curPlayer.getpoints()+weapons[weapon][4]/2);
     }
 }
 
@@ -456,12 +454,14 @@ function drawPoints(tank1,tank2){
     
     ctx.fillStyle= "black";
     ctx.font="25px Georgia";
-    ctx.fillText("Player 1:\n"+p1,width*.1,40);
-    ctx.fillText("Player 2:\n"+p2,width*.7,40);
+    ctx.fillText("Player 1:",width*.01,25);
+    ctx.fillText("Player 2:",width*.91,25);
+    ctx.fillText(p1,width*.015,47);
+    ctx.fillText(p2,width*.915,47);
 }
 
 function checkEndGame(){
-    if(volley>10){
+    if(volley>1){
         if(tank1.getpoints()>tank2.getpoints())
             endGame(tank2);
         else if(tank1.getpoints()<tank2.getpoints())
@@ -471,6 +471,7 @@ function checkEndGame(){
 }
 
 function redraw(){
+    console.log("gasdzjk");
     ctx.restore();
     ctx.clearRect(0, 0, width, height);
     drawTerrain();
@@ -482,29 +483,33 @@ function redraw(){
     checkEndGame();
 }
 
-var base = canvas.height*0.9;
-var roughness =  0.1;
+var base = canvas.height*0.8;
+var roughness =  randRange(2.7,3.2);
 var iterations =  5;
 var p;
 var points =  [];//to store the mountains outer points
 
 var  len =  points.length;
 generate();
-var terrainY =  [];
-var t = 0;
 
-for(var i =  1; i < len; i++) 
-    {    
-    var m= (points[i].y-points[i-1].y)/(points[i].x-points[i-1].x);
+function getTerrainY(){
+    var t = 0;
+    var terrainY = [];
+    for(var i =  1; i < len; i++){    
+        var m = (points[i].y-points[i-1].y)/(points[i].x-points[i-1].x);
         t= 0;
-        for(var j= points[i-1].x; j < points[i].x; ++j)
-        {
+        for(var j= points[i-1].x; j < points[i].x; ++j){
             temp= new point(Math.floor(j),Math.floor(points[i-1].y+m*(t++)));
             terrainY.push(temp.y);
         }
+    }
+    return terrainY;
 }
+var terrainY =  getTerrainY();
+
 
 document.addEventListener('keydown', function(event) {
+    //console.log(gamePaused,gamePlay,gameStarted,event.keyCode);
     if(gameStarted == true){
         ctx.restore();
         ctx.clearRect(0, 0, width, height);
@@ -542,8 +547,13 @@ document.addEventListener('keydown', function(event) {
             pauseGame();
         }
         else if(event.keyCode == 82){   //'r' restarts the game
-            // startGame(); if you want to play with same terrain
-            location.reload();
+            if(gamePlay){
+                ctx.drawImage(bg,0,0,width,height);
+                generate();
+                terrainY =  getTerrainY();
+                startGame(); //if you want to play with same terrain
+            //location.reload();
+            }
         }
         redraw();
     }
@@ -551,7 +561,16 @@ document.addEventListener('keydown', function(event) {
         if(event.keyCode == 13 ){
             startGame();
         }
+        else if(event.keyCode == 82){
+            //gameStarted = true;
+            ctx.drawImage(bg,0,0,width,height);
+            generate();
+            terrainY =  getTerrainY();
+            startGame();
+            // console.log(gameStarted);
+        }
     }
 },false);
 
-introCard();
+startGame();
+// console.log(gameStarted);

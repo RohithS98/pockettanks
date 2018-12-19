@@ -28,8 +28,8 @@ canvas{
 	min-height: 560; */
 	width: 100%;
 	max-width: 1200px;
-	min-width: 500px;
-	background: url("assets/img/canvasbg.jpg");
+	/* min-width: 500px; */
+	/* background: url("../assets/img/bg.png"); */
 	background-size: cover;
 }
 
