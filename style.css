@@ -15,30 +15,6 @@ body,html{
   }
 }
 
-h1{
-	margin: 0 auto;
-	text-align: center;
-	border-radius: 5px;
-	box-shadow: 0px 3px 3px 0px #C7C7C7 inset;
-	background: none repeat scroll 0 0 #E9E9E9;
-	padding: 5px;
-	width: 15vw;
-	font-size: 2em;
-	font-family: 'Gloria Hallelujah';
-	text-shadow: 2px 1px #00e9ff;
-}
-
-footer{
-	box-sizing: border-box;
-	text-align: center;
-	height:50px;
-	/*background: #000000;*/
-	border-radius: 5px;
-	font-size: 1.2em;
-	background: none repeat scroll 0 0 #E9E9E9;
-	box-shadow: 0px 3px 3px 0px #C7C7C7 inset;
-}
-
 #heart{
 	animation: shrink 1s infinite alternate;
 }
@@ -51,6 +27,8 @@ canvas{
 	/* min-width: 1200;
 	min-height: 560; */
 	width: 100%;
+	max-width: 1200px;
+	min-width: 500px;
 	background: url("assets/img/canvasbg.jpg");
 	background-size: cover;
 }

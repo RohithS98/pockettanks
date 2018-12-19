@@ -1,6 +1,31 @@
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 
+//define all variables
+var width = canvas.width;
+var height = canvas.height;
+var terrainY = new Array();
+var weapons = [[8,7,"blue", "Regular",10], [11,5,"red","Medium",20],
+               [14,3,"black", "Large",30]];
+var tank1 = new tank(1);
+var tank2 = new tank(2);
+var curPlayer = 1;
+
+var gamePaused = false;
+var gamePlay = false;
+var gameStarted = false;
+
+var gravity = .02;
+var rally = 0;
+var volley = 1;
+
+//images
+var bg = new Image();
+var bgi = new Image();
+
+bg.src = 'assets/img/bg.png';
+bgi.src = 'assets/img/canvasbg.jpg';
+
 function circle(ctx, cx, cy, radius, color) {
     ctx.fillStyle = color;
     ctx.beginPath();
@@ -69,14 +94,14 @@ function drawTerrain(){
     }
 }
 
-function tank(start){
-    this.player = start;
-    this.w = 0;
-    this.health = 100;
-    this.moves = 50;
-    this.power = 50;
-    this.steepbool = false;
-    if(start == 1){
+function tank(playerNo){
+    this.player = playerNo;
+    this.weapon = 0;
+    this.points = 0;
+    this.movesLeft = 75;
+    this.power = 70;
+    this.tooSteep = false;
+    if(this.player == 1){
         this.px = 60;
         this.theta = Math.PI/4;
     }
@@ -85,44 +110,41 @@ function tank(start){
         this.theta = 3*Math.PI/4;
     }
     this.getplayer= function(){return this.player}
-    
     this.angle = function(){return this.theta+this.phi}
-        
-    this.setpx = function(x){this.px = x}//position
+    this.setpx = function(x){this.px = x}
     this.getpx = function(){return this.px}
     this.setpy = function(y){this.py = y}
     this.getpy = function(){return terrainY[this.px]}
     
-    this.setnx = function(x){this.nx = x}//nozzle end
+    this.setnx = function(x){this.nx = x}
     this.getnx = function(){return this.nx}
     this.setny = function(y){this.ny = y}
     this.getny = function(){return this.ny}
        
-    this.settheta = function(x){this.theta = x}//angle of tank
+    this.settheta = function(x){this.theta = x}
     this.gettheta = function(){return this.theta}
 
     this.setphi = function(x){this.phi = x}
     this.getphi = function(){return this.phi}
     
-    this.sethealth = function(x){this.health = x}//health of tank
-    this.gethealth = function(){return this.health}
+    this.setpoints = function(x){this.points = x}
+    this.getpoints = function(){return this.points}
     
     this.seti = function(x){this.i = x}
     this.geti = function(){return this.i}
     
-    this.changeWeapon = function(){this.w = (this.w+1)%3;}//weapon of tank
-    this.getweapon = function(){return this.w;}
+    this.changeWeapon = function(){this.weapon = (this.weapon+1)%3;}
+    this.getweapon = function(){return this.weapon;}
     
-    this.getmoves = function(){return this.moves}//moves of tank
-    this.moved = function(){this.moves = this.moves-1}
+    this.getmoves = function(){return this.movesLeft}
+    this.moved = function(){this.movesLeft = this.movesLeft-1}
    
-    this.toosteep = function(){this.steepbool = true}//checking steep level
+    this.toosteep = function(){this.steepbool = true}
     this.notsteep = function(){this.steepbool = false}
     this.steep = function(){return this.steepbool}
    
-    this.getpower = function(){return this.power}//power of Turret
+    this.getpower = function(){return this.power}
     this.setpower = function(tpower){this.power = tpower;}
-    //ugh realised this.xxx is public and var is private.
 }
 
 function introCard(){
@@ -411,6 +433,7 @@ function drawSetup(curPlayer){
 
     ctx.font="20px Georgia";
     ctx.fillText("Player "+ curPlayer.getplayer() + "'s turn!", width/2-75, 40);
+    //console.log(weapons);
     ctx.fillText("Your current weapon is: "+ weapons[curPlayer.getweapon()][3] , width/2-135, 65);
     if(curPlayer.getplayer() == 1){
         ctx.fillText("Angle: " + (Math.floor((curPlayer.gettheta()*360/(2*Math.PI)))), width/2-165, 90);
@@ -420,73 +443,31 @@ function drawSetup(curPlayer){
     }
     ctx.fillText("Power: " + curPlayer.getpower(), width/2-55, 90);
     ctx.fillText("Moves: " + curPlayer.getmoves(), width/2+75, 90);
-    if(curPlayer.getmoves() == 0 ){
-        curPlayer.notsteep();
-        ctx.font = "25px Georgia"
-        ctx.fillText("No More Moves!", width/2-96, 155);
-    }
-    if(curPlayer.steep() == true){
-            ctx.font = "25px Georgia";
-            ctx.fillText("That is too steep!", width/2-100, 155);
-    }
+    // if(curPlayer.getmoves() == 0 ){
+    //     curPlayer.notsteep();
+    //     ctx.font = "25px Georgia"
+    //     ctx.fillText("No More Moves!", width/2-96, 155);
+    // }
 }
 
-function drawHealthBar(tank1,tank2){
-    var health1 = tank1.gethealth();
-    var health2 = tank2.gethealth();
+function drawPoints(tank1,tank2){
+    var p1 = tank1.getpoints();
+    var p2 = tank2.getpoints();
     
     ctx.fillStyle= "black";
     ctx.font="25px Georgia";
-    ctx.fillText("Player 1 Health: "+health1,width*.1,40);
-    ctx.fillText("Player 2 Health: "+health2,width*.7,40);
-    
-    //p1_health
-    var my_grad=ctx.createLinearGradient(width*.1,0,width*.1+150,0);
-    my_grad.addColorStop(0,"firebrick");
-    my_grad.addColorStop(0.5,"gold");
-    my_grad.addColorStop(1,"limegreen");
-    ctx.fillStyle = "black"
-    ctx.fillRect(width*.1,50,150,50);
-    ctx.fillStyle=my_grad;
-    ctx.strokeStyle = "black";
-    if(health1>=0){
-        ctx.fillRect(width*.1,50,health1*3/2,50);
-    }
-    ctx.strokeRect(width*.1,50,150,50);
-    
-    //p2_health
-    var my_gradn=ctx.createLinearGradient(width*.7,0,width*.7+150,0);//why should i initialise again?
-    my_gradn.addColorStop(0,"firebrick");
-    my_gradn.addColorStop(0.5,"gold");
-    my_gradn.addColorStop(1,"limegreen");
-    ctx.fillStyle = "black"
-    ctx.fillRect(width*.7,50,150,50);
-    ctx.fillStyle=my_gradn;
-    ctx.strokeStyle = "black";
-    if(health2>=0){
-        ctx.fillRect(width*.7,50,health2*3/2,50);
-    }
-    ctx.strokeRect(width*.7,50,150,50);
+    ctx.fillText("Player 1:\n"+p1,width*.1,40);
+    ctx.fillText("Player 2:\n"+p2,width*.7,40);
 }
 
 function checkEndGame(){
     if(volley>10){
-        if(tank1.gethealth()>tank2.gethealth())
+        if(tank1.getpoints()>tank2.getpoints())
             endGame(tank2);
-        else if(tank1.gethealth()<tank2.gethealth())
-                endGame(tank1);
-            else endGame();
-
-    }  
-    else   if(tank1.gethealth()<= 0){
-                tank1.sethealth(0);
-                endGame(tank1);
-            }
-            else if(tank2.gethealth()<=0){
-                    tank2.sethealth(0);
-                    endGame(tank2);
-                }  
-
+        else if(tank1.getpoints()<tank2.getpoints())
+            endGame(tank1);
+        else endGame();
+    }
 }
 
 function redraw(){
@@ -497,38 +478,12 @@ function redraw(){
     drawTank(tank2);
     if(gamePaused == true){drawPauseScreen();}
     drawSetup(curPlayer);
-    drawHealthBar(tank1,tank2);
+    drawPoints(tank1,tank2);
     checkEndGame();
 }
 
-
-//define all variables
-var width = canvas.width;
-var height = canvas.height;
-var terrainY = new Array();
-var weapons = [[8,7,"blue", "Regular",10], [11,5,"red","Medium",20],
-               [14,3,"black", "Large",30]];
-var tank1 = new tank(1);
-var tank2 = new tank(2);
-var curPlayer = 1;
-
-var gamePaused = false;
-var gamePlay = false;
-var gameStarted = false;
-
-var gravity = .02;
-var rally = 0;
-var volley = 1;
-
-//images
-var bg = new Image();
-var bgi = new Image();
-
-bg.src = 'assets/img/bg.png';
-bgi.src = 'assets/img/canvasbg.jpg';
-
 var base = canvas.height*0.9;
-var roughness =  3.0;
+var roughness =  0.1;
 var iterations =  5;
 var p;
 var points =  [];//to store the mountains outer points
