@@ -508,7 +508,7 @@ function drawPoints(tank1,tank2){
 }
 
 function checkEndGame(){
-    if(Round>1){
+    if(Round>10){
         if(tank1.getpoints()>tank2.getpoints())
             endGame(tank2);
         else if(tank1.getpoints()<tank2.getpoints())
