@@ -15,8 +15,8 @@ body,html{
   }
 }
 
-
-h1{	margin: 0 auto;
+h1{
+	margin: 0 auto;
 	text-align: center;
 	border-radius: 5px;
 	box-shadow: 0px 3px 3px 0px #C7C7C7 inset;
@@ -26,8 +26,7 @@ h1{	margin: 0 auto;
 	font-size: 2em;
 	font-family: 'Gloria Hallelujah';
 	text-shadow: 2px 1px #00e9ff;
-
-	}
+}
 
 footer{
 	box-sizing: border-box;
@@ -49,8 +48,9 @@ canvas{
 	background: #E9E9E9;
 	margin: 5px auto;
 	border-radius: 10px;
-	min-width: 1200;
-	min-height: 560;
+	/* min-width: 1200;
+	min-height: 560; */
+	width: 100%;
 	background: url("assets/img/canvasbg.jpg");
 	background-size: cover;
 }

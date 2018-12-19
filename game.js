@@ -76,7 +76,7 @@ function tank(start){
     this.moves = 50;
     this.power = 50;
     this.steepbool = false;
-    if(start ==1){
+    if(start == 1){
         this.px = 60;
         this.theta = Math.PI/4;
     }
