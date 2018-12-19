@@ -43,7 +43,7 @@ function tank(playerNo){
     this.player = playerNo;
     this.weapon = 0;
     this.points = 0;
-    this.movesLeft = 75;
+    this.movesLeft = 60;
     this.power = 70;
     this.tooSteep = false;
     if(this.player == 1){
@@ -102,12 +102,11 @@ var gamePlay = false;
 var gameStarted = false;
 
 var gravity = .02;
-var rally = 0;
-var Round = 1;
+var par = 0;
+var Round = 10;
 
 //images
 var bg = new Image();
-var bgi = new Image();
 var ab = new Image();
 var ar = new Image();
 var winpl1 = new Image();
@@ -115,7 +114,6 @@ var winpl2 = new Image();
 var drawgame = new Image();
 
 bg.src = 'assets/img/bg1.jpg';
-bgi.src = 'assets/img/canvasbg.jpg';
 ab.src = 'assets/img/arrow-blue.svg';
 ar.src = 'assets/img/arrow-red.svg';
 winpl1.src = 'assets/img/trophyp1.svg';
@@ -144,7 +142,7 @@ function randRange(min,max){
     return rand;
 }
 
-function generatePoints(width) {
+function genPoints(width) {
     var displacement = 300;//mxm height of terrainY to be displaced above base line
     points =  [];
     var temp =  [];
@@ -173,7 +171,7 @@ function generatePoints(width) {
 }
 
 function generate() {
-    generatePoints(width);
+    genPoints(width);
     len =  points.length;
 }
 
@@ -217,7 +215,7 @@ function endGame(loser = 0){
 function startGame(){
     gameStarted = true;
     curPlayer = 1;
-    rally = 0;
+    par = 0;
     Round = 1;
     //
     drawTerrain();
@@ -392,6 +390,8 @@ function launch(){
     var x = curPlayer.getnx();
     var y = curPlayer.getny();
     var clear = false;
+    var audio = new Audio('assets/music/bomb.mp3');
+    audio.play()
     var ani = setInterval(function(){projectile()}, 10);
 
     function projectile(){
@@ -422,8 +422,8 @@ function launch(){
                 otherPlayer = tank2; 
             }
             gamePlay=true;
-             ++rally;
-            if(rally%2==0 && rally!=0)++Round;
+             ++par;
+            if(par%2==0 && par!=0)++Round;
            
             redraw();
         }
