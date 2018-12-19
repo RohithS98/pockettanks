@@ -10,64 +10,64 @@ var weapons = [[8,7,"blue", "Regular",10], [11,5,"red","Medium",20],
 
 //Hello
 
-function Angle(a1){
-    var start=4.72;
-    var cw=ctx.canvas.width/2 + 60;
-    var ch=ctx.canvas.height - 60;
-    var diff;
-    var bar=setInterval(progressBar(a1),50);
+// function Angle(a1){
+//     var start = 4.72;
+//     var cw = ctx.canvas.width/2 + 60;
+//     var ch = ctx.canvas.height - 60;
+//     var diff;
+//     var bar = setInterval(progressBar(a1),50);
     
-    function progressBar(al){
-        diff=(al/100)*Math.PI*2;
-        ctx.beginPath();
-        ctx.arc(cw,ch,width*0.0416,0,2*Math.PI,false);
-        ctx.fillStyle='#FFF';
-        ctx.fill();
-        ctx.strokeStyle='#e7f2ba';
-        ctx.stroke();
-        ctx.fillStyle='#000';
-        ctx.strokeStyle='#b3cf3c';
-        ctx.textAlign='center';
-        ctx.lineWidth=15;
-        ctx.font = '10pt Verdana';
-        ctx.beginPath();
-        ctx.arc(cw,ch,width*0.0416,start,diff+start,false);
-        ctx.stroke();
-        ctx.fillText(al*180/100,cw+2,ch+6);
-        if(al>=50){
-            clearTimeout(bar);
-        }
-    }
-}
+//     function progressBar(al){
+//         diff=(al/100)*Math.PI*2;
+//         ctx.beginPath();
+//         ctx.arc(cw,ch,width*0.0416,0,2*Math.PI,false);
+//         ctx.fillStyle='#FFF';
+//         ctx.fill();
+//         ctx.strokeStyle='#e7f2ba';
+//         ctx.stroke();
+//         ctx.fillStyle='#000';
+//         ctx.strokeStyle='#b3cf3c';
+//         ctx.textAlign='center';
+//         ctx.lineWidth=15;
+//         ctx.font = '10pt Verdana';
+//         ctx.beginPath();
+//         ctx.arc(cw,ch,width*0.0416,start,diff+start,false);
+//         ctx.stroke();
+//         ctx.fillText(al*180/100,cw+2,ch+6);
+//         if(al>=50){
+//             clearTimeout(bar);
+//         }
+//     }
+// }
      
-function drawPowerBar(p1){
-    var start=4.72;
-    var cw=ctx.canvas.width/2;
-    var ch=ctx.canvas.height/2;
-    var diff;
-    var bar=setInterval(progressBar(p1),50);
-    function progressBar(p1){
-        diff=(p1/100)*Math.PI*2;
-        ctx.beginPath();
-        ctx.arc(width/2 - 60,height-60,width*0.0416,0,2*Math.PI,false);
-        ctx.fillStyle='#FFF';
-        ctx.fill();
-        ctx.strokeStyle='#e7f2ba';
-        ctx.stroke();
-        ctx.fillStyle='#000';
-        ctx.strokeStyle='#b3cf3c';
-        ctx.textAlign='center';
-        ctx.lineWidth=15;
-        ctx.font = '10pt Verdana';
-        ctx.beginPath();
-        ctx.arc(width/2 - 60,height-60,width*0.0416,start,diff+start,false);
-        ctx.stroke();
-        ctx.fillText(p1,width/2 - 58,height-54);
-        if(p1>=50){
-            clearTimeout(bar);
-        }
-    }
-}
+// function drawPowerBar(p1){
+//     var start=4.72;
+//     var cw=ctx.canvas.width/2;
+//     var ch=ctx.canvas.height/2;
+//     var diff;
+//     var bar=setInterval(progressBar(p1),50);
+//     function progressBar(p1){
+//         diff=(p1/100)*Math.PI*2;
+//         ctx.beginPath();
+//         ctx.arc(width/2 - 60,height-60,width*0.0416,0,2*Math.PI,false);
+//         ctx.fillStyle='#FFF';
+//         ctx.fill();
+//         ctx.strokeStyle='#e7f2ba';
+//         ctx.stroke();
+//         ctx.fillStyle='#000';
+//         ctx.strokeStyle='#b3cf3c';
+//         ctx.textAlign='center';
+//         ctx.lineWidth=15;
+//         ctx.font = '10pt Verdana';
+//         ctx.beginPath();
+//         ctx.arc(width/2 - 60,height-60,width*0.0416,start,diff+start,false);
+//         ctx.stroke();
+//         ctx.fillText(p1,width/2 - 58,height-54);
+//         if(p1>=50){
+//             clearTimeout(bar);
+//         }
+//     }
+// }
     
 
 function tank(playerNo){
@@ -493,21 +493,17 @@ function drawSetup(curPlayer){
 
     ctx.font="20px Georgia";
     ctx.fillText("Player "+ curPlayer.getplayer() + "'s turn!", width/2-75, 40);
-    //console.log(weapons);
     ctx.fillText("Your current weapon is: "+ weapons[curPlayer.getweapon()][3] , width/2-135, 65);
     if(curPlayer.getplayer() == 1){
         ctx.fillText("Angle: " + (Math.floor((curPlayer.gettheta()*360/(2*Math.PI)))), width/2-165, 90);
+        // drawPowerBar(curPlayer.getpower());
+        // Angle(Math.floor((curPlayer.gettheta()*360*100/(2*180*Math.PI))));
     }
     else {
         ctx.fillText("Angle: " + (180-Math.floor((curPlayer.gettheta()*360/(2*Math.PI)))), width/2-165, 90);
     }
     ctx.fillText("Power: " + curPlayer.getpower(), width/2-55, 90);
     ctx.fillText("Moves: " + curPlayer.getmoves(), width/2+75, 90);
-    // if(curPlayer.getmoves() == 0 ){
-    //     curPlayer.notsteep();
-    //     ctx.font = "25px Georgia"
-    //     ctx.fillText("No More Moves!", width/2-96, 155);
-    // }
 }
 
 function drawPoints(tank1,tank2){
