@@ -143,7 +143,7 @@ function randRange(min,max){
 }
 
 function genPoints(width) {
-    var displacement = 300;//mxm height of terrainY to be displaced above base line
+    var disp = 300;//mxm height of terrainY to be displaced above base line
     points =  [];
     var temp =  [];
     points[0] =  new point(0, 0 + base);
@@ -156,15 +156,15 @@ function genPoints(width) {
             var p2 =  points[j+1];
             var mid =  midPoint(p1, p2);
             if(mid.x > canvas.width / 3 && mid.x < canvas.width * 0.66){
-                mid.y += randRange( -displacement, -displacement / 2);
+                mid.y += randRange( -disp, -disp / 2);
             }
             else{
-                mid.y += randRange(-displacement / 10, -displacement / 25);
+                mid.y += randRange(-disp / 10, -disp / 25);
             }
             temp.push(p1, mid);
         }
         temp.push(points[points.length - 1]);
-        displacement *=  roughness/5;
+        disp *=  roughness/5;
         points =  temp;
     }
     return points;
@@ -243,7 +243,7 @@ function pauseGame(){
     }
 }
 
-function drawPauseScreen(){
+function drawPauseMenu(){
     ctx.globalAlpha = 0.4;
     ctx.fillStyle = "black";
     ctx.fillRect(100,130,1000,400);
@@ -251,10 +251,10 @@ function drawPauseScreen(){
     ctx.fillStyle= "white";
     ctx.font="40px Georgia";
     ctx.fillText("Game Paused!", width/2-135, 200);
-    popUp();
+    helpMenu1();
 }
 
-function popUp(){
+function helpMenu1(){
     ctx.fillStyle = "white";
     ctx.font="25px Georgia";
     ctx.fillText("Aim & Instructions:", 200, 250);
@@ -281,7 +281,6 @@ function createTanks(curPlayer,otherPlayer){
     otherPlayer.setpy(terrainY[curPlayer.getpx()]-20);
 }
 
-//This function draws the tanks
 function drawTank(tank){
     if(tank.getplayer() == 1)  
         ctx.fillStyle = "red";
@@ -308,7 +307,7 @@ function drawTank(tank){
     ctx.closePath();
     ctx.fill();
   
-    var midx1= tank.getpx()+25*Math.cos(0.927293432+tank.getphi()); //0.927293432 is the angle in a 3:4:5 Triangle
+    var midx1= tank.getpx()+25*Math.cos(0.927293432+tank.getphi());
     if(terrainY[tank.getpx()] >terrainY[tank.getpx()+tank.geti()]){
         var midy1=terrainY[tank.getpx()]-Math.abs(25*Math.sin((0.696706709+tank.getphi())%Math.PI));
     }
@@ -338,8 +337,7 @@ function drawTank(tank){
     
 }
 
-//this function changes the angle of the Turret
-function rotateTurret(curPlayer, dir){
+function rotGun(curPlayer, dir){
     if(curPlayer.getplayer()==2){
         dir= -dir;
     }
@@ -354,7 +352,6 @@ function rotateTurret(curPlayer, dir){
     }
 }
 
-//this function moves the tank
 function moveTank(curPlayer, dir){
     if(curPlayer.getmoves() != 0){
         curPlayer.setpx(curPlayer.getpx()+dir);
@@ -382,7 +379,7 @@ function changeDelta(victim){
         delta = Math.abs(terrainY[victim.getpx()]-terrainY[victim.getpx()+victim.geti()]);
     }
 }
-//this function launches the cannon
+
 function launch(){
     gamePlay = false;
     weapon = curPlayer.getweapon();
@@ -430,7 +427,6 @@ function launch(){
     }
 }
 
-//this function makes a hole in the terrain where the weapon lands
 function explode(x,y,radius,player){
     x = Math.round(x);
     y = Math.round(y);
@@ -441,7 +437,6 @@ function explode(x,y,radius,player){
    
 }
 
-//this function checks if the weapon hits the tank
 function checkDirectHit(cx,cy,victim){
     
     
@@ -525,7 +520,7 @@ function redraw(){
     drawTank(tank2);
     drawSetup(curPlayer);
     drawPoints(tank1,tank2);
-    if(gamePaused == true){drawPauseScreen();}
+    if(gamePaused == true){drawPauseMenu();}
     checkEndGame();
 }
 
@@ -533,7 +528,7 @@ var base = canvas.height*0.8;
 var roughness =  randRange(2.7,3.2);
 var iterations =  5;
 var p;
-var points =  [];//to store the mountains outer points
+var points =  [];
 
 var  len =  points.length;
 generate();
@@ -560,16 +555,16 @@ document.addEventListener('keydown', function(event) {
         ctx.clearRect(0, 0, width, height);
         drawTerrain();
         if (event.keyCode == 38 && !gamePaused && gamePlay){
-            rotateTurret(curPlayer,1);  //up rotates turret upwards
+            rotGun(curPlayer,1); 
         }
         else if(event.keyCode == 40 && !gamePaused && gamePlay){
-            rotateTurret(curPlayer,-1);       //down rotates turret downwards
+            rotGun(curPlayer,-1);
         }
         else if(event.keyCode ==37 && !gamePaused && gamePlay){
-            moveTank(curPlayer, -5);    //left moves tanks to the left
+            moveTank(curPlayer, -5);
         }
         else if(event.keyCode == 39 && !gamePaused && gamePlay){
-            moveTank(curPlayer, 5);    //right moves tank to the right
+            moveTank(curPlayer, 5);
         }
         else if(event.keyCode == 65 && !gamePaused && gamePlay){
            
@@ -581,23 +576,22 @@ document.addEventListener('keydown', function(event) {
                 curPlayer.setpower(curPlayer.getpower()+1);
             }
         }
-        else if(event.keyCode == 87 && !gamePaused && gamePlay){   //'w' changes the weapons
+        else if(event.keyCode == 87 && !gamePaused && gamePlay){
             curPlayer.changeWeapon();
         }
-        else if(event.keyCode == 32 && !gamePaused && gamePlay){   //spacebar shoots!!
+        else if(event.keyCode == 32 && !gamePaused && gamePlay){
           
             launch(curPlayer);
         }
-        else if(event.keyCode == 80){   //'p' Pauses the game
+        else if(event.keyCode == 80){
             pauseGame();
         }
-        else if(event.keyCode == 82){   //'r' restarts the game
+        else if(event.keyCode == 82){
             if(gamePlay){
                 ctx.drawImage(bg,0,0,width,height);
                 generate();
                 terrainY =  getTerrainY();
-                startGame(); //if you want to play with same terrain
-            //location.reload();
+                startGame();
             }
         }
         redraw();
@@ -607,7 +601,6 @@ document.addEventListener('keydown', function(event) {
             startGame();
         }
         else if(event.keyCode == 82){
-            //gameStarted = true;
             ctx.drawImage(bg,0,0,width,height);
             generate();
             terrainY =  getTerrainY();
